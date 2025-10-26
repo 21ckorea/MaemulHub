@@ -21,7 +21,16 @@ type Contract = {
 };
 
 async function fetchContract(id: string) {
-  const base = process.env.NEXT_PUBLIC_API_BASE || 'http://127.0.0.1:4000';
+  const apiEnv = process.env.NEXT_PUBLIC_API_BASE;
+  const prodDefault = 'https://maemul-hub-api.vercel.app/api';
+  const base = (() => {
+    if (process.env.VERCEL) {
+      if (!apiEnv) return prodDefault;
+      if (apiEnv.startsWith('http')) return apiEnv;
+      return prodDefault;
+    }
+    return apiEnv && apiEnv.length > 0 ? apiEnv : 'http://127.0.0.1:4000';
+  })();
   const res = await fetch(`${base}/contracts/${id}`, { cache: 'no-store' });
   if (!res.ok) throw new Error('Failed to load');
   return (await res.json()) as Contract;
