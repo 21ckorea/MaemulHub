@@ -11,9 +11,8 @@ type Customer = {
 async function fetchCustomer(id: string) {
   const base = (() => {
     if (typeof window === 'undefined') {
-      const appOrigin = process.env.NEXT_PUBLIC_APP_BASE
-        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://127.0.0.1:3000');
-      return `${appOrigin}/api`;
+      const api = process.env.INTERNAL_API_BASE || process.env.NEXT_PUBLIC_API_BASE || (process.env.VERCEL ? 'https://maemul-hub-api.vercel.app/api' : 'http://127.0.0.1:4000');
+      return api;
     }
     const envBase = process.env.NEXT_PUBLIC_API_BASE || '/api';
     const appBase = process.env.NEXT_PUBLIC_APP_BASE || window.location.origin;
