@@ -38,4 +38,9 @@ export class PropertyController {
   remove(@Param('id') id: string) {
     return this.service.remove(id);
   }
+
+  @Get('diag/:id')
+  diag(@Param('id') id: string) {
+    return this.service.diagnostics(id);
+  }
 }

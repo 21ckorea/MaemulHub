@@ -13,9 +13,17 @@ type Property = {
 
 async function fetchProperty(id: string) {
   const apiEnv = process.env.NEXT_PUBLIC_API_BASE;
-  // In production SSR, localhost defaults would fail. Provide a safe prod default.
+  // In production SSR, always use absolute API base. If env is missing or relative, fall back to prodDefault.
   const prodDefault = 'https://maemul-hub-api.vercel.app/api';
-  const baseEnv = apiEnv && apiEnv.length > 0 ? apiEnv : (process.env.VERCEL ? prodDefault : 'http://127.0.0.1:4000');
+  const baseEnv = (() => {
+    if (process.env.VERCEL) {
+      if (!apiEnv) return prodDefault;
+      if (apiEnv.startsWith('http')) return apiEnv;
+      // relative like '/api' is not usable on server without origin → use prod default
+      return prodDefault;
+    }
+    return apiEnv && apiEnv.length > 0 ? apiEnv : 'http://127.0.0.1:4000';
+  })();
   const appBase = process.env.NEXT_PUBLIC_APP_BASE || 'http://localhost:3000';
   const base = baseEnv.startsWith('http') ? baseEnv : `${appBase}${baseEnv}`;
   const res = await fetch(`${base}/properties/${id}`, { cache: 'no-store' });

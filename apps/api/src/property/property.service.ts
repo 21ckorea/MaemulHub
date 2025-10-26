@@ -158,4 +158,24 @@ export class PropertyService {
     ]);
     return { ok: true };
   }
+
+  async diagnostics(id: string) {
+    const buf = Buffer.from(id);
+    const hex = Array.from(buf).map((b) => b.toString(16).padStart(2, '0')).join(' ');
+    const unique = await this.prisma.property.findUnique({ where: { id } }).catch(() => null);
+    const first = await this.prisma.property.findFirst({ where: { id: { equals: id } } }).catch(() => null);
+    const trimmed = await this.prisma.property
+      .findFirst({ where: { id: { equals: id.trim() } } })
+      .catch(() => null);
+    const recent = await this.prisma.property.findMany({ select: { id: true }, orderBy: { createdAt: 'desc' }, take: 10 });
+    return {
+      received: id,
+      length: id.length,
+      hex,
+      foundByUnique: !!unique,
+      foundByFirst: !!first,
+      foundByTrimmed: !!trimmed,
+      recent,
+    };
+  }
 }
