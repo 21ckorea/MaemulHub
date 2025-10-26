@@ -12,7 +12,17 @@ export type ShareLink = {
 };
 
 export default function ShareLinksPanel({ propertyId }: { propertyId: string }) {
-  const base = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+  function resolveApiBase() {
+    const envBase = process.env.NEXT_PUBLIC_API_BASE;
+    const prodDefault = "https://maemul-hub-api.vercel.app/api";
+    if (typeof window === "undefined") {
+      return envBase && envBase.length > 0 ? envBase : (process.env.VERCEL ? prodDefault : "/api");
+    }
+    const appBase = process.env.NEXT_PUBLIC_APP_BASE || window.location.origin;
+    const baseEnv = envBase && envBase.length > 0 ? envBase : (process.env.VERCEL ? prodDefault : "/api");
+    return baseEnv.startsWith("http") ? baseEnv : `${appBase}${baseEnv}`;
+  }
+  const base = resolveApiBase();
   const { show } = useToast();
   const [items, setItems] = useState<ShareLink[]>([]);
   const [loading, setLoading] = useState(false);
