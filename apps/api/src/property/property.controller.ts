@@ -7,6 +7,16 @@ import { UpdatePropertyDto } from './dto/update-property.dto';
 export class PropertyController {
   constructor(private readonly service: PropertyService) {}
 
+  @Get('diag/:id')
+  diag(@Param('id') id: string) {
+    return this.service.diagnostics(id);
+  }
+
+  @Get('recent')
+  recent() {
+    return this.service.recentIds();
+  }
+
   @Get()
   list(
     @Query('page') page?: string,
@@ -39,8 +49,4 @@ export class PropertyController {
     return this.service.remove(id);
   }
 
-  @Get('diag/:id')
-  diag(@Param('id') id: string) {
-    return this.service.diagnostics(id);
-  }
 }
