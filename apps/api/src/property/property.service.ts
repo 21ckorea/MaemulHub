@@ -159,6 +159,10 @@ export class PropertyService {
     return { ok: true };
   }
 
+  async recentIds() {
+    return this.prisma.property.findMany({ select: { id: true }, orderBy: { createdAt: 'desc' }, take: 20 });
+  }
+
   async diagnostics(id: string) {
     const buf = Buffer.from(id);
     const hex = Array.from(buf).map((b) => b.toString(16).padStart(2, '0')).join(' ');
