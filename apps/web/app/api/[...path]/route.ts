@@ -25,6 +25,16 @@ async function forward(method: string, req: NextRequest) {
     init.body = body as any;
   }
   const res = await fetch(target, init);
+  if (!res.ok) {
+    try {
+      const preview = await res.clone().text();
+      // eslint-disable-next-line no-console
+      console.error('Proxy upstream error', { target, status: res.status, snippet: preview?.slice(0, 256) });
+    } catch {
+      // eslint-disable-next-line no-console
+      console.error('Proxy upstream error', { target, status: res.status });
+    }
+  }
   // sanitize response headers
   const outHeaders = new Headers(res.headers);
   outHeaders.delete('content-encoding');
