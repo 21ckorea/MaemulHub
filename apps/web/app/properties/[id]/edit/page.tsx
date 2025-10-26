@@ -72,9 +72,11 @@ export default function EditPropertyPage({ params }: { params: { id: string } })
           photos: Array.isArray(p.photos)
             ? p.photos.map((u: string) => {
                 if (!u) return u;
-                if (u.startsWith('http')) return u;
-                if (u.startsWith('/')) return `${apiBase}${u}`;
-                return `${apiBase}/${u}`;
+                u = u.replace(/\\/g, '/');
+                if (u.startsWith('http://')) u = u.replace(/^http:\/\//, 'https://');
+                if (u.startsWith('http')) return encodeURI(u);
+                const full = u.startsWith('/') ? `${apiBase}${u}` : `${apiBase}/${u}`;
+                return encodeURI(full);
               })
             : [],
         });

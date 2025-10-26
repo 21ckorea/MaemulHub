@@ -18,7 +18,14 @@ export class BlobController {
       if (!files || files.length === 0) throw new BadRequestException('no files');
       const uploaded = [] as Array<{ url: string; pathname: string; size: number; contentType: string | undefined }>;
       for (const f of files) {
-        const key = `uploads/${Date.now()}-${Math.round(Math.random() * 1e9)}-${f.originalname}`;
+        // sanitize original filename to avoid problematic URL characters
+        const orig = String(f.originalname || 'file');
+        const safeName = orig
+          .normalize('NFKD')
+          .replace(/[^a-zA-Z0-9._-]/g, '_')
+          .replace(/_+/g, '_')
+          .replace(/^_+|_+$/g, '') || 'file';
+        const key = `uploads/${Date.now()}-${Math.round(Math.random() * 1e9)}-${safeName}`;
         const res = await put(key, f.buffer, { access: 'public', contentType: f.mimetype });
         uploaded.push({ url: res.url, pathname: res.pathname, size: f.size, contentType: f.mimetype });
       }
