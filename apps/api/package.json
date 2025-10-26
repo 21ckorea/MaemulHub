@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/main.ts",
     "build": "prisma generate --schema prisma/schema.prisma && tsc -p tsconfig.build.json",
+    "postinstall": "prisma generate --schema prisma/schema.prisma",
     "start": "node dist/main.js",
     "lint": "echo 'lint not configured'",
     "prisma:generate": "prisma generate --schema prisma/schema.prisma",
