@@ -13,14 +13,44 @@ type Inquiry = {
 };
 
 async function fetchInquiry(id: string) {
-  const base = process.env.NEXT_PUBLIC_API_BASE || '/api';
-  const res = await fetch(`${base}/inquiries/${id}`, { cache: 'no-store' });
-  if (!res.ok) throw new Error('Failed to load');
+  const base = (() => {
+    if (typeof window === 'undefined') {
+      const appOrigin = process.env.NEXT_PUBLIC_APP_BASE
+        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://127.0.0.1:3000');
+      return `${appOrigin}/api`;
+    }
+    const envBase = process.env.NEXT_PUBLIC_API_BASE || '/api';
+    const appBase = process.env.NEXT_PUBLIC_APP_BASE || window.location.origin;
+    return envBase.startsWith('http') ? envBase : `${appBase}${envBase}`;
+  })();
+  const url = `${base}/inquiries/${id}`;
+  const res = await fetch(url, { cache: 'no-store' });
+  if (res.status === 404) return null as any;
+  if (!res.ok) {
+    try {
+      const body = await res.clone().text();
+      // eslint-disable-next-line no-console
+      console.error('inquiry detail fetch failed', { url, status: res.status, snippet: body?.slice(0, 256) });
+    } catch {
+      // eslint-disable-next-line no-console
+      console.error('inquiry detail fetch failed', { url, status: res.status });
+    }
+    return null as any;
+  }
   return (await res.json()) as Inquiry;
 }
 
 export default async function InquiryDetail({ params }: { params: { id: string } }) {
   const i = await fetchInquiry(params.id);
+  if (!i) {
+    return (
+      <section>
+        <h2>의뢰 상세</h2>
+        <p className="text-red-600">해당 의뢰를 찾을 수 없습니다.</p>
+        <p><a href="/inquiries" className="underline">목록으로</a></p>
+      </section>
+    );
+  }
   return (
     <section>
       <h2>의뢰 상세</h2>
