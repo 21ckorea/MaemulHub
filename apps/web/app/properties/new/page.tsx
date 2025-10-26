@@ -32,7 +32,13 @@ export default function NewPropertyPage() {
   const [uploading, setUploading] = useState(false);
   const [photos, setPhotos] = useState<string[]>([]);
 
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:4000";
+  // Ensure absolute base and include '/api' prefix for Vercel serverless
+  const baseEnv = process.env.NEXT_PUBLIC_API_BASE || '/api';
+  const appBase = process.env.NEXT_PUBLIC_APP_BASE || (typeof window !== 'undefined' ? window.location.origin : '');
+  let apiBase = baseEnv.startsWith('http') ? baseEnv : `${appBase}${baseEnv}`;
+  if (!/\/(api)(\/|$)/.test(new URL(apiBase, appBase).pathname)) {
+    apiBase = apiBase.replace(/\/?$/, '') + '/api';
+  }
 
   async function onFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
@@ -41,7 +47,7 @@ export default function NewPropertyPage() {
     try {
       const fd = new FormData();
       for (const f of files) fd.append("files", f);
-      const res = await fetch(`${apiBase}/uploads`, { method: "POST", body: fd });
+      const res = await fetch(`${apiBase}/blob/upload`, { method: "POST", body: fd });
       if (!res.ok) throw new Error("upload failed");
       const json = await res.json();
       const urls = (json.files || [])

@@ -4,7 +4,13 @@ import { useEffect, useState } from "react";
 
 export default function EditPropertyPage({ params }: { params: { id: string } }) {
   const id = params.id;
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:4000";
+  // Ensure absolute base and include '/api' prefix for Vercel serverless
+  const baseEnv = process.env.NEXT_PUBLIC_API_BASE || '/api';
+  const appBase = process.env.NEXT_PUBLIC_APP_BASE || (typeof window !== 'undefined' ? window.location.origin : '');
+  let apiBase = baseEnv.startsWith('http') ? baseEnv : `${appBase}${baseEnv}`;
+  if (!/\/(api)(\/|$)/.test(new URL(apiBase, appBase).pathname)) {
+    apiBase = apiBase.replace(/\/?$/, '') + '/api';
+  }
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState<string | null>(null);
   const [form, setForm] = useState<any>({
@@ -90,7 +96,7 @@ export default function EditPropertyPage({ params }: { params: { id: string } })
     try {
       const fd = new FormData();
       for (const f of files) fd.append("files", f);
-      const res = await fetch(`${apiBase}/uploads`, { method: "POST", body: fd });
+      const res = await fetch(`${apiBase}/blob/upload`, { method: "POST", body: fd });
       if (!res.ok) throw new Error("upload failed");
       const json = await res.json();
       const urls = (json.files || [])
