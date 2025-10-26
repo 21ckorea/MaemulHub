@@ -2,9 +2,18 @@ import ExportCsvButton from "../../components/ExportCsvButton";
 type Search = { q?: string; sort?: string; page?: string; pageSize?: string };
 
 async function fetchCustomers(params: Search) {
-  const baseEnv = process.env.NEXT_PUBLIC_API_BASE || 'http://127.0.0.1:4000';
-  const appBase = process.env.NEXT_PUBLIC_APP_BASE || 'http://localhost:3000';
-  const base = baseEnv.startsWith('http') ? baseEnv : `${appBase}${baseEnv}`;
+  const apiEnv = process.env.NEXT_PUBLIC_API_BASE;
+  const prodDefault = 'https://maemul-hub-api.vercel.app/api';
+  const base = (() => {
+    if (process.env.VERCEL) {
+      if (!apiEnv) return prodDefault;
+      if (apiEnv.startsWith('http')) return apiEnv;
+      return prodDefault;
+    }
+    const appBase = process.env.NEXT_PUBLIC_APP_BASE || 'http://localhost:3000';
+    const baseEnv = apiEnv && apiEnv.length > 0 ? apiEnv : 'http://127.0.0.1:4000';
+    return baseEnv.startsWith('http') ? baseEnv : `${appBase}${baseEnv}`;
+  })();
   const usp = new URLSearchParams();
   usp.set('page', (params.page ?? '1') as string);
   usp.set('pageSize', (params.pageSize ?? '20') as string);
