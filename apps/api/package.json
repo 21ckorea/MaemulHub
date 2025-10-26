@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/main.ts",
-    "build": "prisma generate --schema prisma/schema.prisma && tsc -p tsconfig.build.json",
+    "build": "prisma migrate deploy --schema prisma/schema.prisma && prisma generate --schema prisma/schema.prisma && tsc -p tsconfig.build.json",
     "postinstall": "prisma generate --schema prisma/schema.prisma",
     "start": "node dist/main.js",
     "lint": "echo 'lint not configured'",
@@ -13,7 +13,8 @@
     "seed": "node -r dotenv/config -r ts-node/register prisma/seed.ts",
     "db:seed": "prisma db seed",
     "db:migrate": "prisma migrate dev --name init --schema apps/api/prisma/schema.prisma",
-    "db:generate": "prisma generate --schema apps/api/prisma/schema.prisma"
+    "db:generate": "prisma generate --schema apps/api/prisma/schema.prisma",
+    "prisma:deploy": "prisma migrate deploy --schema prisma/schema.prisma"
   },
   "dependencies": {
     "@vercel/blob": "^0.23.1",
