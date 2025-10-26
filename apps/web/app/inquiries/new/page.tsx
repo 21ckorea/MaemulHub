@@ -20,7 +20,17 @@ export default function NewInquiryPage() {
     setLoading(true);
     setError(null);
     try {
-      const base = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:4000";
+      function resolveApiBase() {
+        const envBase = process.env.NEXT_PUBLIC_API_BASE;
+        const prodDefault = "https://maemul-hub-api.vercel.app/api";
+        if (typeof window === "undefined") {
+          return envBase && envBase.length > 0 ? envBase : (process.env.VERCEL ? prodDefault : "/api");
+        }
+        const appBase = process.env.NEXT_PUBLIC_APP_BASE || window.location.origin;
+        const baseEnv = envBase && envBase.length > 0 ? envBase : (process.env.VERCEL ? prodDefault : "/api");
+        return baseEnv.startsWith("http") ? baseEnv : `${appBase}${baseEnv}`;
+      }
+      const base = resolveApiBase();
       const payload: any = {
         title: title.trim(),
         source,
