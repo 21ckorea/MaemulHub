@@ -4,8 +4,8 @@ import InquiryFiltersClient from '../../components/InquiryFiltersClient';
 type Search = { q?: string; status?: string; source?: string; sort?: string; page?: string; pageSize?: string };
 
 async function fetchInquiries(params: Search) {
-  const baseEnv = process.env.NEXT_PUBLIC_API_BASE || 'http://127.0.0.1:4000';
-  const appBase = process.env.NEXT_PUBLIC_APP_BASE || 'http://localhost:3000';
+  const baseEnv = process.env.NEXT_PUBLIC_API_BASE || '/api';
+  const appBase = process.env.NEXT_PUBLIC_APP_BASE || '';
   const base = baseEnv.startsWith('http') ? baseEnv : `${appBase}${baseEnv}`;
   const usp = new URLSearchParams();
   usp.set('page', (params.page ?? '1') as string);

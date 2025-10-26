@@ -5,7 +5,7 @@ import { useToast } from "./ToastProvider";
 
 export default function InquiryStatusActions({ id, status }: { id: string; status: string }) {
   const router = useRouter();
-  const base = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+  const base = process.env.NEXT_PUBLIC_API_BASE || "/api";
   const { show } = useToast();
 
   const setStatus = async (next: string) => {
@@ -42,3 +42,4 @@ export default function InquiryStatusActions({ id, status }: { id: string; statu
     </div>
   );
 }
+

@@ -22,9 +22,9 @@ async function fetchProperty(id: string) {
       // relative like '/api' is not usable on server without origin → use prod default
       return prodDefault;
     }
-    return apiEnv && apiEnv.length > 0 ? apiEnv : 'http://127.0.0.1:4000';
+    return apiEnv && apiEnv.length > 0 ? apiEnv : '/api';
   })();
-  const appBase = process.env.NEXT_PUBLIC_APP_BASE || 'http://localhost:3000';
+  const appBase = process.env.NEXT_PUBLIC_APP_BASE || '';
   const base = baseEnv.startsWith('http') ? baseEnv : `${appBase}${baseEnv}`;
   const res = await fetch(`${base}/properties/${id}`, { cache: 'no-store' });
   if (res.status === 404) return null;

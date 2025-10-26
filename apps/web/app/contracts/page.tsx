@@ -10,8 +10,8 @@ async function fetchContracts(params: Search) {
       if (apiEnv.startsWith('http')) return apiEnv;
       return prodDefault;
     }
-    const appBase = process.env.NEXT_PUBLIC_APP_BASE || 'http://localhost:3000';
-    const baseEnv = apiEnv && apiEnv.length > 0 ? apiEnv : 'http://127.0.0.1:4000';
+    const appBase = process.env.NEXT_PUBLIC_APP_BASE || '';
+    const baseEnv = apiEnv && apiEnv.length > 0 ? apiEnv : '/api';
     return baseEnv.startsWith('http') ? baseEnv : `${appBase}${baseEnv}`;
   })();
   const usp = new URLSearchParams();

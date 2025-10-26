@@ -20,8 +20,8 @@ type PublicShare = {
 };
 
 async function fetchPublic(token: string): Promise<PublicShare | null> {
-  const baseEnv = process.env.NEXT_PUBLIC_API_BASE || 'http://127.0.0.1:4000';
-  const appBase = process.env.NEXT_PUBLIC_APP_BASE || 'http://localhost:3000';
+  const baseEnv = process.env.NEXT_PUBLIC_API_BASE || '/api';
+  const appBase = process.env.NEXT_PUBLIC_APP_BASE || '';
   const base = baseEnv.startsWith('http') ? baseEnv : `${appBase}${baseEnv}`;
   const res = await fetch(`${base}/share-links/public/${token}`, { cache: 'no-store' });
   if (res.status === 404) return null;
