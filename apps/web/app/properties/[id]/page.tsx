@@ -12,7 +12,10 @@ type Property = {
 };
 
 async function fetchProperty(id: string) {
-  const baseEnv = process.env.NEXT_PUBLIC_API_BASE || 'http://127.0.0.1:4000';
+  const apiEnv = process.env.NEXT_PUBLIC_API_BASE;
+  // In production SSR, localhost defaults would fail. Provide a safe prod default.
+  const prodDefault = 'https://maemul-hub-api.vercel.app/api';
+  const baseEnv = apiEnv && apiEnv.length > 0 ? apiEnv : (process.env.VERCEL ? prodDefault : 'http://127.0.0.1:4000');
   const appBase = process.env.NEXT_PUBLIC_APP_BASE || 'http://localhost:3000';
   const base = baseEnv.startsWith('http') ? baseEnv : `${appBase}${baseEnv}`;
   const res = await fetch(`${base}/properties/${id}`, { cache: 'no-store' });
@@ -22,15 +25,18 @@ async function fetchProperty(id: string) {
 
 export default async function PropertyDetail({ params }: { params: { id: string } }) {
   const p = await fetchProperty(params.id);
-  const base = process.env.NEXT_PUBLIC_API_BASE || '/api';
+  const base = (process.env.NEXT_PUBLIC_API_BASE && process.env.NEXT_PUBLIC_API_BASE.length > 0)
+    ? process.env.NEXT_PUBLIC_API_BASE
+    : (process.env.VERCEL ? 'https://maemul-hub-api.vercel.app/api' : '/api');
   const photos = Array.isArray(p.photos)
     ? p.photos.map((u) => {
         if (!u) return u;
         u = u.replace(/\\/g, '/');
-        if (u.startsWith('http')) return u;
+        if (u.startsWith('http://')) u = u.replace(/^http:\/\//, 'https://');
+        if (u.startsWith('http')) return encodeURI(u);
         if (u.startsWith('/api/')) return u;
-        if (u.startsWith('/')) return `${base}${u}`;
-        return `${base}/${u}`;
+        if (u.startsWith('/')) return encodeURI(`${base}${u}`);
+        return encodeURI(`${base}/${u}`);
       })
     : [];
   const TYPE_LABEL: Record<string, string> = {
