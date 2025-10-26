@@ -19,9 +19,20 @@ async function fetchCustomer(id: string) {
     const appBase = process.env.NEXT_PUBLIC_APP_BASE || window.location.origin;
     return envBase.startsWith('http') ? envBase : `${appBase}${envBase}`;
   })();
-  const res = await fetch(`${base}/customers/${id}`, { cache: 'no-store' });
+  const url = `${base}/customers/${id}`;
+  const res = await fetch(url, { cache: 'no-store' });
   if (res.status === 404) return null as any;
-  if (!res.ok) throw new Error('Failed to load');
+  if (!res.ok) {
+    try {
+      const body = await res.clone().text();
+      // eslint-disable-next-line no-console
+      console.error('customer detail fetch failed', { url, status: res.status, snippet: body?.slice(0, 256) });
+    } catch {
+      // eslint-disable-next-line no-console
+      console.error('customer detail fetch failed', { url, status: res.status });
+    }
+    return null as any;
+  }
   return (await res.json()) as Customer;
 }
 
