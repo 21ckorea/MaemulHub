@@ -1,14 +1,12 @@
-import serverlessExpress from '@vendia/serverless-express';
 import { createExpressApp } from '../src/app.factory';
 
-let cachedServer: ReturnType<typeof serverlessExpress> | null = null;
+let cachedApp: any = null;
 
-async function getServer() {
-  if (!cachedServer) {
-    const app = await createExpressApp();
-    cachedServer = serverlessExpress({ app });
+async function getApp() {
+  if (!cachedApp) {
+    cachedApp = await createExpressApp();
   }
-  return cachedServer;
+  return cachedApp;
 }
 
 export default async function handler(req: any, res: any) {
@@ -20,6 +18,6 @@ export default async function handler(req: any, res: any) {
   } else if (req.url === '/api') {
     req.url = '/';
   }
-  const server = await getServer();
-  return server(req, res);
+  const app = await getApp();
+  return app(req, res);
 }
