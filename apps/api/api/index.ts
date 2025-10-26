@@ -14,7 +14,9 @@ export default async function handler(req: any, res: any) {
   // are defined without that prefix (e.g., '/blob/upload'). Strip it so
   // the Express router matches correctly.
   if (typeof req?.url === 'string' && req.url.startsWith('/api/')) {
-    req.url = req.url.substring(4); // remove leading '/api'
+    // remove leading '/api' but keep the leading slash so Express matches '/...'
+    const stripped = req.url.substring(4);
+    req.url = stripped.startsWith('/') ? stripped : `/${stripped}`;
   } else if (req.url === '/api') {
     req.url = '/';
   }
