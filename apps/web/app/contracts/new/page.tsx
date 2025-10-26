@@ -10,7 +10,7 @@ import PropertyAutocomplete from "../../../components/PropertyAutocomplete";
 import AssigneeAutocomplete from "../../../components/AssigneeAutocomplete";
 import { useToast } from "../../../components/ToastProvider";
 
-export default function NewContractPage() {
+function NewContractForm() {
   const router = useRouter();
   const { show } = useToast();
   const base = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:4000";
@@ -31,7 +31,6 @@ export default function NewContractPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Prefill from query params
   useEffect(() => {
     const pid = search.get("propertyId");
     const cid = search.get("customerId");
@@ -75,7 +74,6 @@ export default function NewContractPage() {
   };
 
   return (
-    <Suspense fallback={<section><h2>새 계약</h2><p>로딩 중...</p></section>}>
     <section>
       <h2>새 계약</h2>
       <p>
@@ -142,6 +140,13 @@ export default function NewContractPage() {
         {error && <p className="text-red-600 mt-2">{error}</p>}
       </form>
     </section>
+  );
+}
+
+export default function NewContractPage() {
+  return (
+    <Suspense fallback={<section><h2>새 계약</h2><p>로딩 중...</p></section>}>
+      <NewContractForm />
     </Suspense>
   );
 }
