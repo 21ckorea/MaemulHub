@@ -3,12 +3,13 @@ type Search = { q?: string; status?: string; type?: string; assignee?: string; p
 
 async function fetchContracts(params: Search) {
   const apiEnv = process.env.NEXT_PUBLIC_API_BASE;
-  const prodDefault = 'https://maemul-hub-api.vercel.app/api';
+  const prodDefault = '/api';
   const base = (() => {
     if (process.env.VERCEL) {
       if (!apiEnv) return prodDefault;
       if (apiEnv.startsWith('http')) return apiEnv;
-      return prodDefault;
+      // allow relative like '/api' on Next.js server
+      return apiEnv;
     }
     const appBase = process.env.NEXT_PUBLIC_APP_BASE || '';
     const baseEnv = apiEnv && apiEnv.length > 0 ? apiEnv : '/api';

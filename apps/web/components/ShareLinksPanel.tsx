@@ -14,12 +14,13 @@ export type ShareLink = {
 export default function ShareLinksPanel({ propertyId }: { propertyId: string }) {
   function resolveApiBase() {
     const envBase = process.env.NEXT_PUBLIC_API_BASE;
-    const prodDefault = "https://maemul-hub-api.vercel.app/api";
+    const prodDefault = "https://maemul-hub-api.vercel.app";
     if (typeof window === "undefined") {
       return envBase && envBase.length > 0 ? envBase : (process.env.VERCEL ? prodDefault : "/api");
     }
+    // On the client, always prefer the proxy '/api' to avoid CORS
     const appBase = process.env.NEXT_PUBLIC_APP_BASE || window.location.origin;
-    const baseEnv = envBase && envBase.length > 0 ? envBase : (process.env.VERCEL ? prodDefault : "/api");
+    const baseEnv = envBase && envBase.length > 0 ? envBase : "/api";
     return baseEnv.startsWith("http") ? baseEnv : `${appBase}${baseEnv}`;
   }
   const base = resolveApiBase();

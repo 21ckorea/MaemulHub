@@ -20,9 +20,17 @@ type PublicShare = {
 };
 
 async function fetchPublic(token: string): Promise<PublicShare | null> {
-  const baseEnv = process.env.NEXT_PUBLIC_API_BASE || '/api';
-  const appBase = process.env.NEXT_PUBLIC_APP_BASE || '';
-  const base = baseEnv.startsWith('http') ? baseEnv : `${appBase}${baseEnv}`;
+  // On the server, call our own proxy '/api' with absolute app origin; on the client, proxy via /api
+  const base = (() => {
+    if (typeof window === 'undefined') {
+      const appOrigin = process.env.NEXT_PUBLIC_APP_BASE
+        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://127.0.0.1:3000');
+      return `${appOrigin}/api`;
+    }
+    const envBase = process.env.NEXT_PUBLIC_API_BASE || '/api';
+    const appBase = process.env.NEXT_PUBLIC_APP_BASE || window.location.origin;
+    return envBase.startsWith('http') ? envBase : `${appBase}${envBase}`;
+  })();
   const res = await fetch(`${base}/share-links/public/${token}`, { cache: 'no-store' });
   if (res.status === 404) return null;
   if (!res.ok) return null;
