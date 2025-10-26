@@ -19,12 +19,22 @@ async function fetchProperty(id: string) {
   const appBase = process.env.NEXT_PUBLIC_APP_BASE || 'http://localhost:3000';
   const base = baseEnv.startsWith('http') ? baseEnv : `${appBase}${baseEnv}`;
   const res = await fetch(`${base}/properties/${id}`, { cache: 'no-store' });
+  if (res.status === 404) return null;
   if (!res.ok) throw new Error('Failed to load');
   return (await res.json()) as Property;
 }
 
 export default async function PropertyDetail({ params }: { params: { id: string } }) {
   const p = await fetchProperty(params.id);
+  if (!p) {
+    return (
+      <section>
+        <h2>매물 상세</h2>
+        <p className="text-red-600">해당 매물을 찾을 수 없습니다.</p>
+        <p><a href="/properties" className="underline">목록으로</a></p>
+      </section>
+    );
+  }
   const base = (process.env.NEXT_PUBLIC_API_BASE && process.env.NEXT_PUBLIC_API_BASE.length > 0)
     ? process.env.NEXT_PUBLIC_API_BASE
     : (process.env.VERCEL ? 'https://maemul-hub-api.vercel.app/api' : '/api');
