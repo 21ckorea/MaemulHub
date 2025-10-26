@@ -2,15 +2,12 @@ import ExportCsvButton from "../../components/ExportCsvButton";
 type Search = { q?: string; status?: string; type?: string; assignee?: string; page?: string; pageSize?: string; sort?: string };
 
 async function fetchContracts(params: Search) {
-  const apiEnv = process.env.NEXT_PUBLIC_API_BASE;
-  const prodDefault = '/api';
   const base = (() => {
-    if (process.env.VERCEL) {
-      if (!apiEnv) return prodDefault;
-      if (apiEnv.startsWith('http')) return apiEnv;
-      // allow relative like '/api' on Next.js server
-      return apiEnv;
+    if (typeof window === 'undefined') {
+      const api = process.env.INTERNAL_API_BASE || process.env.NEXT_PUBLIC_API_BASE || (process.env.VERCEL ? 'https://maemul-hub-api.vercel.app/api' : 'http://127.0.0.1:4000');
+      return api;
     }
+    const apiEnv = process.env.NEXT_PUBLIC_API_BASE;
     const appBase = process.env.NEXT_PUBLIC_APP_BASE || '';
     const baseEnv = apiEnv && apiEnv.length > 0 ? apiEnv : '/api';
     return baseEnv.startsWith('http') ? baseEnv : `${appBase}${baseEnv}`;
@@ -23,8 +20,19 @@ async function fetchContracts(params: Search) {
   if (params.type) usp.set('type', params.type);
   if (params.assignee) usp.set('assignee', params.assignee);
   if (params.sort) usp.set('sort', params.sort);
-  const res = await fetch(`${base}/contracts?${usp.toString()}`, { cache: 'no-store' });
-  if (!res.ok) throw new Error('Failed to load contracts');
+  const url = `${base}/contracts?${usp.toString()}`;
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) {
+    try {
+      const body = await res.clone().text();
+      // eslint-disable-next-line no-console
+      console.error('contracts list fetch failed', { url, status: res.status, snippet: body?.slice(0, 256) });
+    } catch {
+      // eslint-disable-next-line no-console
+      console.error('contracts list fetch failed', { url, status: res.status });
+    }
+    return { items: [], total: 0, page: Number(params.page || '1'), pageSize: Number(params.pageSize || '20') } as any;
+  }
   return res.json();
 }
 
