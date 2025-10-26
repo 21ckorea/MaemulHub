@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server';
 export const dynamic = 'force-dynamic';
 
 function buildTargetUrl(req: NextRequest) {
-  const base = process.env.INTERNAL_API_BASE || 'https://maemul-hub-api.vercel.app/api';
+  const base = process.env.INTERNAL_API_BASE || 'https://maemul-hub-api.vercel.app';
   const pathname = req.nextUrl.pathname.replace(/^\/(api)\/?/, '');
   const qs = req.nextUrl.search ? `?${req.nextUrl.search.replace(/^\?/, '')}` : '';
   return `${base}/${pathname}${qs}`;
