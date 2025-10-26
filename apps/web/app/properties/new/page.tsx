@@ -63,10 +63,12 @@ export default function NewPropertyPage() {
         .map((f: any) => (f.url as string))
         .map((u: string) => {
           u = (u || '').replace(/\\/g, '/');
-          if (u.startsWith('http')) return u;
+          // Ensure https for blob storage and encode non-ASCII safely
+          if (u.startsWith('http://')) u = u.replace(/^http:\/\//, 'https://');
+          if (u.startsWith('http')) return encodeURI(u);
           const base = apiBase;
-          if (u.startsWith('/')) return `${base}${u}`;
-          return `${base}/${u}`;
+          const full = u.startsWith('/') ? `${base}${u}` : `${base}/${u}`;
+          return encodeURI(full);
         });
       setPhotos((prev) => [...prev, ...urls]);
       setMsg(null);
