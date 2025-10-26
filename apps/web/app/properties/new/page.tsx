@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -32,13 +34,20 @@ export default function NewPropertyPage() {
   const [uploading, setUploading] = useState(false);
   const [photos, setPhotos] = useState<string[]>([]);
 
-  // Ensure absolute base and include '/api' prefix for Vercel serverless
-  const baseEnv = process.env.NEXT_PUBLIC_API_BASE || '/api';
-  const appBase = process.env.NEXT_PUBLIC_APP_BASE || (typeof window !== 'undefined' ? window.location.origin : '');
-  let apiBase = baseEnv.startsWith('http') ? baseEnv : `${appBase}${baseEnv}`;
-  if (!/\/(api)(\/|$)/.test(new URL(apiBase, appBase).pathname)) {
-    apiBase = apiBase.replace(/\/?$/, '') + '/api';
+  // Resolve API base. On the server (prerender), avoid using window/URL.
+  function resolveApiBase() {
+    const baseEnv = process.env.NEXT_PUBLIC_API_BASE || '/api';
+    if (typeof window === 'undefined') {
+      return baseEnv; // defer full normalization to client runtime
+    }
+    const appBase = process.env.NEXT_PUBLIC_APP_BASE || window.location.origin;
+    let abs = baseEnv.startsWith('http') ? baseEnv : `${appBase}${baseEnv}`;
+    if (!/\/(api)(\/|$)/.test(new URL(abs, appBase).pathname)) {
+      abs = abs.replace(/\/?$/, '') + '/api';
+    }
+    return abs;
   }
+  const apiBase = resolveApiBase();
 
   async function onFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
