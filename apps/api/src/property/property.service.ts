@@ -77,7 +77,9 @@ export class PropertyService {
   }
 
   async get(id: string) {
-    const prop = await this.prisma.property.findUnique({ where: { id } });
+    let prop = await this.prisma.property.findUnique({ where: { id } }).catch(() => null);
+    if (!prop) prop = await this.prisma.property.findFirst({ where: { id: { equals: id } } }).catch(() => null);
+    if (!prop) prop = await this.prisma.property.findFirst({ where: { id: { equals: id.trim() } } }).catch(() => null);
     if (!prop) throw new NotFoundException({ error: { code: 'C404-001', message: 'NotFound' } });
     return prop;
   }

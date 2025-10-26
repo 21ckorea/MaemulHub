@@ -27,7 +27,9 @@ export class PropertyController {
     @Query('sort') sort?: string,
     @Query('recent') recent?: string,
     @Query('diagId') diagId?: string,
+    @Query('detailId') detailId?: string,
   ) {
+    if (detailId) return this.service.get(detailId);
     if (diagId) return this.service.diagnostics(diagId);
     if (recent === '1') return this.service.recentIds();
     return this.service.list({ page: Number(page), pageSize: Number(pageSize), q, type, status, sort });
