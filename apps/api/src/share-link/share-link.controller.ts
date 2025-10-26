@@ -10,6 +10,12 @@ export class ShareLinkController {
     return this.service.create(body);
   }
 
+  @Get()
+  listByQuery(@Query('propertyId') propertyId?: string) {
+    if (propertyId) return this.service.listByProperty(propertyId);
+    return [];
+  }
+
   @Get('property/:propertyId')
   listByProperty(@Param('propertyId') propertyId: string) {
     return this.service.listByProperty(propertyId);
