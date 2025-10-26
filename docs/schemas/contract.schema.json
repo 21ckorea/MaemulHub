@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://maemulhub/docs/schemas/contract.schema.json",
+  "type": "object",
+  "required": ["property_id", "type", "parties"],
+  "properties": {
+    "id": {"type": "string"},
+    "property_id": {"type": "string"},
+    "type": {"enum": ["sale", "lease", "jeonse", "monthly"]},
+    "parties": {"type": "object", "properties": {"lessor": {"type": "string"}, "lessee": {"type": "string"}}},
+    "terms": {"type": "object"},
+    "status": {"type": "string"},
+    "checklist": {"type": "array", "items": {"type": "object", "properties": {"label": {"type": "string"}, "required": {"type": "boolean"}, "done": {"type": "boolean"}, "done_at": {"type": "string", "format": "date-time"}}}},
+    "important_dates": {"type": "object", "properties": {"contract": {"type": "string", "format": "date"}, "move_in": {"type": "string", "format": "date"}, "balance": {"type": "string", "format": "date"}}},
+    "commission": {"type": "integer", "minimum": 0},
+    "files": {"type": "array", "items": {"type": "string"}},
+    "activities": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,172 @@
+// Prisma schema for MaemulHub API
+// DB URL is read from env: DATABASE_URL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PropertyType {
+  apartment
+  officetel
+  store
+  land
+  multifamily
+  villa
+}
+
+enum DealType {
+  sale
+  jeonse
+  monthly
+  lease
+  rent
+}
+
+enum PropertyStatus {
+  draft
+  review
+  published
+  in_contract
+  closed
+}
+
+enum InquiryStatus {
+  new
+  in_progress
+  closed
+}
+
+enum InquirySource {
+  web
+  phone
+  referral
+  kakao
+}
+
+model Property {
+  id             String         @id @default(cuid())
+  type           PropertyType
+  address        String
+  complexName    String?        @map("complex_name")
+  lat            Float?
+  lng            Float?
+  areaSupply     Float?         @map("area_supply")
+  areaExclusive  Float?         @map("area_exclusive")
+  floor          Int?
+  rooms          Int?
+  baths          Int?
+  builtYear      Int?           @map("built_year")
+  parking        String?
+  dealType       DealType?      @map("deal_type")
+  price          Int?
+  deposit        Int?
+  rent           Int?
+  availableFrom  DateTime?      @map("available_from")
+  maintenanceFee Int?           @map("maintenance_fee")
+  status         PropertyStatus @default(draft)
+  assignee       String?
+  tags           String[]
+  photos         String[]
+  shareLinks     ShareLink[]
+  contracts      Contract[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([dealType])
+  @@index([type])
+  @@index([lat, lng])
+}
+
+model ShareLink {
+  id         String    @id @default(cuid())
+  token      String    @unique
+  propertyId String
+  property   Property  @relation(fields: [propertyId], references: [id])
+  expiresAt  DateTime?
+  password   String? // hashed or plain for demo
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([propertyId])
+  @@index([expiresAt])
+}
+
+model Customer {
+  id        String     @id @default(cuid())
+  name      String
+  phone     String?
+  email     String?
+  tags      String[]
+  inquiries Inquiry[]
+  contracts Contract[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([name])
+}
+
+model Inquiry {
+  id       String        @id @default(cuid())
+  title    String
+  source   InquirySource
+  status   InquiryStatus @default(new)
+  assignee String?
+  notes    String?
+
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([source])
+  @@index([customerId])
+}
+
+enum ContractType {
+  lease
+  rent
+  sale
+}
+
+enum ContractStatus {
+  draft
+  signed
+  cancelled
+}
+
+model Contract {
+  id         String         @id @default(cuid())
+  type       ContractType
+  status     ContractStatus @default(draft)
+  propertyId String
+  property   Property       @relation(fields: [propertyId], references: [id])
+  customerId String
+  customer   Customer       @relation(fields: [customerId], references: [id])
+  price      Decimal?
+  deposit    Decimal?
+  rent       Decimal?
+  signedAt   DateTime?
+  startAt    DateTime?
+  endAt      DateTime?
+  assignee   String?
+  notes      String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([propertyId])
+  @@index([customerId])
+  @@index([type])
+  @@index([status])
+}

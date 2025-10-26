@@ -1,0 +1,31 @@
+@startuml NavFlow
+skinparam monochrome true
+skinparam defaultFontName Noto Sans
+
+title Navigation Flow
+
+start
+:Home;
+if (Choose Tab) then (Properties)
+  :Property List;
+  :Property Detail;
+  if (Edit?) then (yes)
+    :Property Edit;
+  endif
+  :Share Link;
+elseif (Leads)
+  :Lead Inbox;
+  :Lead Detail;
+  :Assign;
+elseif (Customers)
+  :Customer List;
+  :Customer Detail;
+elseif (Contracts)
+  :Contract Pipeline;
+  :Contract Detail;
+elseif (Schedule)
+  :Calendar;
+  :Create/Edit Schedule;
+endif
+stop
+@enduml

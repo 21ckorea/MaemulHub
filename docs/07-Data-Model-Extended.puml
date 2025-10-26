@@ -1,0 +1,89 @@
+@startuml DataModelExtended
+skinparam monochrome true
+skinparam defaultFontName Noto Sans
+
+title Core Data Model (Extended)
+
+class User {+id: string
++name: string
++role: enum
++office_id: string}
+class Office {+id: string
++name: string
++region: string}
+class Property {+id: string
++type: enum
++address: string
++geo: point
++status: enum
++assignee: User}
+class Customer {+id: string
++type: enum
++name: string
++phones: list
++status: enum}
+class Lead {+id: string
++source: enum
++status: enum
++assignee: User}
+class Contract {+id: string
++type: enum
++status: enum
++commission: number}
+class Schedule {+id: string
++title: string
++category: enum
++date: date}
+class IntegrationCache {+id: string
++property_id: string
++data_type: enum
++snapshot: json}
+class Activity {+id: string
++entity_type: enum
++entity_id: string
++type: enum(note,call,file)
++content: string
++user_id: string
++ts: datetime}
+class ShareLink {+id: string
++property_id: string
++visible_fields: list
++password: string
++expires_at: datetime
++view_count: number}
+class IntegrationConfig {+id: string
++provider: enum
++api_key: string
++cache_ttl: number
++verified_at: datetime}
+class AuditLog {+id: string
++entity: string
++action: string
++actor: string
++ts: datetime
++before: json
++after: json
++ip: string}
+
+User "1" -- "*" Property : assignee
+User "1" -- "*" Lead : assignee
+Office "1" -- "*" User
+Office "1" -- "*" Property
+Property "1" -- "*" Contract
+Customer "1" -- "*" Lead
+Contract "1" -- "*" Schedule
+Property "1" -- "*" Schedule
+Property "1" -- "*" IntegrationCache
+Property "1" -- "*" Activity
+Lead "1" -- "*" Activity
+Contract "1" -- "*" Activity
+ShareLink "*" -- "1" Property
+IntegrationConfig "*" -- "1" Office
+AuditLog ..> User
+AuditLog ..> Property
+AuditLog ..> Lead
+AuditLog ..> Contract
+AuditLog ..> Customer
+AuditLog ..> Schedule
+
+@enduml

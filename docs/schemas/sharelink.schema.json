@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://maemulhub/docs/schemas/sharelink.schema.json",
+  "type": "object",
+  "required": ["property_id", "visible_fields"],
+  "properties": {
+    "id": {"type": "string"},
+    "property_id": {"type": "string"},
+    "visible_fields": {"type": "array", "items": {"type": "string"}},
+    "password": {"type": "string"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "utm_source": {"type": "string"},
+    "utm_medium": {"type": "string"},
+    "utm_campaign": {"type": "string"},
+    "view_count": {"type": "integer", "minimum": 0}
+  },
+  "additionalProperties": true
+}

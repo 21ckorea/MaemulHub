@@ -1,0 +1,75 @@
+@startuml DataModelCore
+skinparam monochrome true
+skinparam defaultFontName Noto Sans
+
+title Core Data Model
+
+class User {
+  +id: string
+  +name: string
+  +role: enum
+  +office_id: string
+}
+
+class Office {
+  +id: string
+  +name: string
+  +region: string
+}
+
+class Property {
+  +id: string
+  +type: enum
+  +address: string
+  +geo: point
+  +status: enum
+  +assignee: User
+}
+
+class Customer {
+  +id: string
+  +type: enum
+  +name: string
+  +phones: list
+  +status: enum
+}
+
+class Lead {
+  +id: string
+  +source: enum
+  +status: enum
+  +assignee: User
+}
+
+class Contract {
+  +id: string
+  +type: enum
+  +status: enum
+  +commission: number
+}
+
+class Schedule {
+  +id: string
+  +title: string
+  +category: enum
+  +date: date
+}
+
+class IntegrationCache {
+  +id: string
+  +property_id: string
+  +data_type: enum
+  +snapshot: json
+}
+
+User "1" -- "*" Property : assignee
+User "1" -- "*" Lead : assignee
+Office "1" -- "*" User
+Office "1" -- "*" Property
+Property "1" -- "*" Contract
+Customer "1" -- "*" Lead
+Contract "1" -- "*" Schedule
+Property "1" -- "*" Schedule
+Property "1" -- "*" IntegrationCache
+
+@enduml

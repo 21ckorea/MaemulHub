@@ -1,0 +1,36 @@
+@startuml ArchitectureMVP
+skinparam monochrome true
+skinparam defaultFontName Noto Sans
+
+title High-level Architecture (MVP)
+
+node MobileApp {
+  [UI]
+  [Offline Drafts]
+}
+
+node Backend {
+  [API Gateway]
+  [Auth & RBAC]
+  [Property/Lead/Contract Services]
+  [Scheduler/Notifications]
+}
+
+node DataStores {
+  [Relational DB]
+  [Object Storage(Media)]
+  [Cache]
+}
+
+node Integrations {
+  [RealTrade API]
+  [Building Register API]
+  [Land Use API]
+  [Push(Firebase)]
+}
+
+MobileApp --> Backend
+Backend --> DataStores
+Backend --> Integrations
+
+@enduml

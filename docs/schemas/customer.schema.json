@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://maemulhub/docs/schemas/customer.schema.json",
+  "type": "object",
+  "required": ["id", "type", "name"],
+  "properties": {
+    "id": {"type": "string"},
+    "type": {"enum": ["person", "company"]},
+    "name": {"type": "string", "minLength": 2, "maxLength": 50},
+    "phones": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "email": {"type": "string", "format": "email"},
+    "company_name": {"type": "string"},
+    "preferences": {"type": "object"},
+    "status": {"enum": ["active", "hold", "dormant"]},
+    "consent_flags": {"type": "object", "properties": {"processing": {"type": "boolean"}, "marketing": {"type": "boolean"}}},
+    "tags": {"type": "array", "items": {"type": "string"}},
+    "last_contact_at": {"type": "string", "format": "date-time"}
+  },
+  "additionalProperties": true
+}

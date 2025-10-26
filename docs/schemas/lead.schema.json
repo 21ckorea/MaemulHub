@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://maemulhub/docs/schemas/lead.schema.json",
+  "type": "object",
+  "required": ["source", "status", "requester"],
+  "properties": {
+    "id": {"type": "string"},
+    "source": {"enum": ["share_link", "api", "internal"]},
+    "requester": {"type": "object", "required": ["name", "contact"], "properties": {"name": {"type": "string", "minLength": 2, "maxLength": 50}, "contact": {"type": "string"}}},
+    "payload": {"type": "object"},
+    "status": {"enum": ["new", "consult", "match", "tour", "negotiate", "contract", "closed"]},
+    "assignee": {"type": "string"},
+    "sla": {"type": "object", "properties": {"first_response_due": {"type": "integer", "minimum": 1}, "first_response_at": {"type": "string", "format": "date-time"}, "breach": {"type": "boolean"}}},
+    "recommended_property_ids": {"type": "array", "items": {"type": "string"}},
+    "created_at": {"type": "string", "format": "date-time"}
+  },
+  "additionalProperties": true
+}

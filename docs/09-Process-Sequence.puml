@@ -1,0 +1,30 @@
+@startuml ProcessLeadToContract
+skinparam monochrome true
+skinparam defaultFontName Noto Sans
+
+title Lead → Contract Process (Happy Path)
+
+actor Customer as C
+participant "Lead Form" as LF
+participant "Lead Inbox" as LI
+participant "Agent" as A
+participant "Property Search" as PS
+participant "Contract" as CT
+participant "Schedule" as SC
+
+C -> LF: Submit inquiry (budget, area, type)
+LF -> LI: Create Lead(status=신규, SLA=2h)
+LI -> A: Push notification (new lead)
+A -> LI: Accept/Assign lead
+A -> PS: Search matched properties
+PS --> A: Candidates list
+A -> C: Share shortlist / schedule tour
+A -> SC: Create tour schedule
+C -> A: Attend tour / feedback
+A -> CT: Create contract draft
+CT -> A: Checklist tasks
+A -> CT: Finalize terms & dates
+CT -> C: Sign/Confirm (out of scope: e-sign)
+CT --> A: Contract status=확정
+LI --> A: Close lead as 계약
+@enduml

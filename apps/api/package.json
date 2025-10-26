@@ -1,0 +1,43 @@
+{
+  "name": "api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/main.ts",
+    "build": "prisma generate --schema prisma/schema.prisma && tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "lint": "echo 'lint not configured'",
+    "prisma:generate": "prisma generate --schema prisma/schema.prisma",
+    "prisma:migrate": "prisma migrate dev --name init --schema prisma/schema.prisma",
+    "seed": "node -r dotenv/config -r ts-node/register prisma/seed.ts",
+    "db:seed": "prisma db seed",
+    "db:migrate": "prisma migrate dev --name init --schema apps/api/prisma/schema.prisma",
+    "db:generate": "prisma generate --schema apps/api/prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@vercel/blob": "^0.23.1",
+    "@vendia/serverless-express": "^4.10.1",
+    "@nestjs/mapped-types": "^2.0.5",
+    "@nestjs/common": "^10.3.0",
+    "@nestjs/core": "^10.3.0",
+    "@nestjs/platform-express": "^10.3.0",
+    "@prisma/client": "^5.18.0",
+    "dotenv": "^16.4.5",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/express": "^4.17.21",
+    "@types/multer": "^1.4.12",
+    "prisma": "^5.18.0",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.5"
+  },
+  "prisma": {
+    "seed": "node -r dotenv/config -r ts-node/register prisma/seed.ts"
+  }
+}

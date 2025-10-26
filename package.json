@@ -1,0 +1,21 @@
+{
+  "name": "maemulhub",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel --filter=web --filter=api",
+    "build": "turbo run build --filter=web --filter=api",
+    "lint": "turbo run lint --filter=web --filter=api",
+    "dev:web": "npm run dev -w web",
+    "dev:api": "npm run dev -w api",
+    "format": "prettier -w ."
+  },
+  "devDependencies": {
+    "prettier": "^3.3.2",
+    "turbo": "^2.0.6"
+  }
+}

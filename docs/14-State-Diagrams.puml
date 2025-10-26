@@ -1,0 +1,47 @@
+@startuml PropertyState
+skinparam monochrome true
+skinparam defaultFontName Noto Sans
+
+title Property State
+[*] --> draft
+state draft --> review : submit
+state review --> published : approve
+state published --> in_contract : startContract
+state in_contract --> closed : complete
+state published --> review : unapprove
+@enduml
+
+@startuml LeadState
+skinparam monochrome true
+skinparam defaultFontName Noto Sans
+
+title Lead State
+[*] --> new
+new --> consult : firstResponse
+consult --> match : shortlist
+match --> tour : schedule
+tour --> negotiate : offer
+negotiate --> contract : sign
+contract --> closed : archived
+@enduml
+
+@startuml ContractState
+skinparam monochrome true
+skinparam defaultFontName Noto Sans
+
+title Contract State
+[*] --> drafting
+drafting --> pendingApproval : checklistReady
+pendingApproval --> finalized : approve
+finalized --> archived : complete
+@enduml
+
+@startuml ShareLinkState
+skinparam monochrome true
+skinparam defaultFontName Noto Sans
+
+title ShareLink State
+[*] --> active
+active --> expired : expiresAt
+active --> revoked : revoke
+@enduml
