@@ -31,11 +31,23 @@ export default function ShareLinksPanel({ propertyId }: { propertyId: string }) 
   const load = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${base}/share-links/property/${propertyId}`, { cache: "no-store" });
-      if (!res.ok) throw new Error("load error");
+      // Try query endpoint first (more tolerant on some platforms)
+      const url1 = `${base}/share-links?propertyId=${encodeURIComponent(propertyId)}`;
+      let res = await fetch(url1, { cache: "no-store" });
+      if (!res.ok) {
+        // Fallback to path param endpoint
+        const url2 = `${base}/share-links/property/${propertyId}`;
+        const res2 = await fetch(url2, { cache: "no-store" });
+        if (!res2.ok) {
+          console.error("share-links load failed", { step: "fallback", url1, status1: res.status, url2, status2: res2.status });
+          throw new Error("load error");
+        }
+        res = res2;
+      }
       const data = await res.json();
       setItems(data);
-    } catch {
+    } catch (err) {
+      console.error("share-links load exception", err);
       show("공유 링크 조회 실패", "error");
     } finally {
       setLoading(false);
@@ -51,27 +63,39 @@ export default function ShareLinksPanel({ propertyId }: { propertyId: string }) 
     try {
       const body: any = { propertyId };
       if (expires) body.expiresAt = expires;
-      const res = await fetch(`${base}/share-links`, {
+      const url = `${base}/share-links`;
+      const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      if (!res.ok) throw new Error("create failed");
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        console.error("share-links create failed", { url, status: res.status, errBody });
+        throw new Error("create failed");
+      }
       show("공유 링크가 생성되었습니다", "success");
       setExpires("");
       load();
-    } catch {
+    } catch (err) {
+      console.error("share-links create exception", err);
       show("공유 링크 생성 실패", "error");
     }
   };
 
   const remove = async (id: string) => {
     try {
-      const res = await fetch(`${base}/share-links/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("delete failed");
+      const url = `${base}/share-links/${id}`;
+      const res = await fetch(url, { method: "DELETE" });
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        console.error("share-links delete failed", { url, status: res.status, errBody });
+        throw new Error("delete failed");
+      }
       show("삭제되었습니다", "success");
       load();
-    } catch {
+    } catch (err) {
+      console.error("share-links delete exception", err);
       show("삭제 실패", "error");
     }
   };
