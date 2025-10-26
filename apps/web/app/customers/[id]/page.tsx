@@ -9,23 +9,33 @@ type Customer = {
 };
 
 async function fetchCustomer(id: string) {
-  const apiEnv = process.env.NEXT_PUBLIC_API_BASE;
-  const prodDefault = 'https://maemul-hub-api.vercel.app/api';
   const base = (() => {
-    if (process.env.VERCEL) {
-      if (!apiEnv) return prodDefault;
-      if (apiEnv.startsWith('http')) return apiEnv;
-      return prodDefault;
+    if (typeof window === 'undefined') {
+      const appOrigin = process.env.NEXT_PUBLIC_APP_BASE
+        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://127.0.0.1:3000');
+      return `${appOrigin}/api`;
     }
-    return apiEnv && apiEnv.length > 0 ? apiEnv : 'http://127.0.0.1:4000';
+    const envBase = process.env.NEXT_PUBLIC_API_BASE || '/api';
+    const appBase = process.env.NEXT_PUBLIC_APP_BASE || window.location.origin;
+    return envBase.startsWith('http') ? envBase : `${appBase}${envBase}`;
   })();
   const res = await fetch(`${base}/customers/${id}`, { cache: 'no-store' });
+  if (res.status === 404) return null as any;
   if (!res.ok) throw new Error('Failed to load');
   return (await res.json()) as Customer;
 }
 
 export default async function CustomerDetail({ params }: { params: { id: string } }) {
   const c = await fetchCustomer(params.id);
+  if (!c) {
+    return (
+      <section>
+        <h2>고객 상세</h2>
+        <p className="text-red-600">해당 고객을 찾을 수 없습니다.</p>
+        <p><a href="/customers" className="underline">목록으로</a></p>
+      </section>
+    );
+  }
   return (
     <section>
       <h2>고객 상세</h2>
@@ -52,3 +62,4 @@ export default async function CustomerDetail({ params }: { params: { id: string 
     </section>
   );
 }
+
