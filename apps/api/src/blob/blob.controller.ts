@@ -1,10 +1,16 @@
-import { BadRequestException, Controller, HttpException, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Controller, Get, HttpException, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import type { Express } from 'express';
 import { put } from '@vercel/blob';
 
 @Controller('blob')
 export class BlobController {
+  @Get('debug')
+  debug() {
+    const token = process.env.BLOB_READ_WRITE_TOKEN;
+    return { hasToken: Boolean(token), length: token ? token.length : 0 };
+  }
+
   @Post('upload')
   @UseInterceptors(FilesInterceptor('files', 10))
   async upload(@UploadedFiles() files: Express.Multer.File[]) {
