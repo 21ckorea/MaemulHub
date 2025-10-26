@@ -105,6 +105,7 @@ export class PropertyService {
       builtYear: input.built_year,
       parking: input.parking,
       dealType: input.deal_type,
+      // Store as Decimal (schema updated)
       price: input.price,
       deposit: input.deposit,
       rent: input.rent,

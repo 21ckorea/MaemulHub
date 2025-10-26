@@ -63,11 +63,11 @@ model Property {
   builtYear      Int?           @map("built_year")
   parking        String?
   dealType       DealType?      @map("deal_type")
-  price          Int?
-  deposit        Int?
-  rent           Int?
+  price          Decimal?
+  deposit        Decimal?
+  rent           Decimal?
   availableFrom  DateTime?      @map("available_from")
-  maintenanceFee Int?           @map("maintenance_fee")
+  maintenanceFee Decimal?       @map("maintenance_fee")
   status         PropertyStatus @default(draft)
   assignee       String?
   tags           String[]
